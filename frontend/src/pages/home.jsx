@@ -4,9 +4,15 @@ import axios from "axios";
 export default function JobPortal() {
   const [resume, setResume] = useState(null);
   const [jd, setJd] = useState(null);
+  const [resumeName, setResumeName] = useState("📄 Upload Resume");
+  const [jdName, setJdName] = useState("📜 Upload Job Description");
 
-  const handleFileChange = (event, setFile) => {
-    setFile(event.target.files[0]);
+  const handleFileChange = (event, setFile, setFileName) => {
+    const file = event.target.files[0];
+    if (file) {
+      setFile(file);
+      setFileName(file.name); // Update the label with the selected file name
+    }
   };
 
   const handleUploadResume = async () => {
@@ -59,10 +65,10 @@ export default function JobPortal() {
           <label className="block cursor-pointer border-2 border-dashed border-gray-400 text-gray-700 font-semibold py-3 rounded-lg hover:bg-gray-100 transition">
             <input 
               type="file"
-              onChange={(e) => handleFileChange(e, setResume)}
+              onChange={(e) => handleFileChange(e, setResume, setResumeName)}
               className="hidden"
             />
-            📄 Upload Resume
+            {resumeName}
           </label>
           <button
             onClick={handleUploadResume}
@@ -75,10 +81,10 @@ export default function JobPortal() {
           <label className="block cursor-pointer border-2 border-dashed border-gray-400 text-gray-700 font-semibold py-3 rounded-lg hover:bg-gray-100 transition">
             <input 
               type="file"
-              onChange={(e) => handleFileChange(e, setJd)}
+              onChange={(e) => handleFileChange(e, setJd, setJdName)}
               className="hidden"
             />
-            📜 Upload Job Description
+            {jdName}
           </label>
           <button
             onClick={handleUploadJD}

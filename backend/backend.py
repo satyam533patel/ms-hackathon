@@ -23,7 +23,7 @@ uploaded_jd = None
 
 @app.route("/upload-resume", methods=["POST"])
 def upload_resume():
-    """Endpoint to upload a resume (PDF)."""
+    """Endpoint to upload a resume (PDF) and rename it to 'resume.pdf'."""
     global uploaded_resume  
 
     if "resume" not in request.files:
@@ -34,33 +34,33 @@ def upload_resume():
         return jsonify({"error": "No selected file"}), 400
 
     if file and file.filename.endswith(".pdf"):
-        file_path = os.path.join(app.config["UPLOAD_FOLDER"], file.filename)
+        file_path = os.path.join(app.config["UPLOAD_FOLDER"], "resume.pdf")  # ✅ Rename file
         file.save(file_path)
-        uploaded_resume = file_path  # ✅ Fixed variable name
+        uploaded_resume = file_path  
 
-        return jsonify({"message": "Resume uploaded successfully", "filename": file.filename}), 200
+        return jsonify({"message": "Resume uploaded successfully", "filename": "resume.pdf"}), 200
 
     return jsonify({"error": "Invalid file type"}), 400
 
 
 @app.route("/upload-jd", methods=["POST"])
 def upload_jd():
-    """Endpoint to upload a job description (PDF)."""
+    """Endpoint to upload a job description (PDF) and rename it to 'jd.pdf'."""
     global uploaded_jd  
 
-    if "jd" not in request.files:  # ✅ Fix: Ensure correct key from frontend
+    if "jd" not in request.files:
         return jsonify({"error": "No file part"}), 400
 
-    file = request.files["jd"]  # ✅ Fix: Use correct key
+    file = request.files["jd"]
     if file.filename == "":
         return jsonify({"error": "No selected file"}), 400
 
     if file and file.filename.endswith(".pdf"):
-        file_path = os.path.join(app.config["UPLOAD_FOLDER"], file.filename)
+        file_path = os.path.join(app.config["UPLOAD_FOLDER"], "jd.pdf")  # ✅ Rename file
         file.save(file_path)
-        uploaded_jd = file_path  # ✅ Fixed variable name
+        uploaded_jd = file_path  
 
-        return jsonify({"message": "Job Description uploaded successfully", "filename": file.filename}), 200
+        return jsonify({"message": "Job Description uploaded successfully", "filename": "jd.pdf"}), 200
 
     return jsonify({"error": "Invalid file type"}), 400
 
