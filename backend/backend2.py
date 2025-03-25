@@ -15,7 +15,7 @@ headers = {
     "Ocp-Apim-Subscription-Key": api_key
 }
 
-def extract_resume_text(pdf_path="resume.pdf"):
+def extract_resume_text(pdf_path="resume2.pdf"):
     """Extract text from resume PDF using Azure API."""
     with open(pdf_path, "rb") as file:
         pdf_data = file.read()
