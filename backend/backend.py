@@ -3,6 +3,7 @@ from flask_cors import CORS
 import backend2  # Import your resume processing logic
 import requests
 import os
+from speaker import synthesize_speech
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})  # Allow all requests
@@ -103,6 +104,17 @@ def generate_questions():
         return jsonify({"questions": questions_list})
 
     return jsonify({"error": "No questions found in the response."}), 500
+
+@app.route('/speak', methods=['POST'])
+def speak():
+    data = request.json
+    text = data.get("text")
+
+    if not text:
+        return jsonify({"error": "No text provided"}), 400
+
+    synthesize_speech(text)
+    return jsonify({"message": "Speech synthesis completed"}), 200
 
 
 if __name__ == "__main__":
