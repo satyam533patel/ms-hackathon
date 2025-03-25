@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -6,8 +6,19 @@ export default function PreInterview() {
   const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const navigate = useNavigate();
+  const hasFetched = useRef(false); // Prevent multiple calls
+
+  const speakText = (text) => {
+    if (!text) return; // Prevent speaking empty text
+    axios
+      .post("http://127.0.0.1:5000/speak", { text })
+      .catch((error) => console.error("Speech API error:", error));
+  };
 
   useEffect(() => {
+    if (hasFetched.current) return; // Prevent second API call
+    hasFetched.current = true;
+
     axios
       .post("http://127.0.0.1:5000/generate-questions")
       .then((response) => {
@@ -20,12 +31,18 @@ export default function PreInterview() {
       });
   }, []);
 
+  useEffect(() => {
+    if (questions.length > 0 && currentIndex < questions.length) {
+      speakText(questions[currentIndex]);
+    }
+  }, [currentIndex, questions]);
+
   const handleNext = () => {
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex(currentIndex + 2);
+    if (currentIndex < questions.length - 2) {
+      setCurrentIndex((prevIndex) => prevIndex + 2);
     } else {
       alert("End of questions. Good luck!");
-      navigate("/"); // Redirect back to home
+      navigate("/");
     }
   };
 

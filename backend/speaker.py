@@ -16,7 +16,7 @@ def synthesize_speech(text):
     speech_synthesis_result = speech_synthesizer.speak_text_async(text).get()
     
     if speech_synthesis_result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
-        print(f"Speech synthesized for text: {text}")
+        print(f"Speech synthesized for text: ")
     elif speech_synthesis_result.reason == speechsdk.ResultReason.Canceled:
         cancellation_details = speech_synthesis_result.cancellation_details
         print(f"Speech synthesis canceled: {cancellation_details.reason}")

@@ -101,6 +101,7 @@ def generate_questions():
     if "choices" in response_json and len(response_json["choices"]) > 0:
         questions_text = response_json["choices"][0]["message"]["content"]
         questions_list = questions_text.strip().split("\n")
+        print(questions_list)
         return jsonify({"questions": questions_list})
 
     return jsonify({"error": "No questions found in the response."}), 500
@@ -118,4 +119,4 @@ def speak():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True,use_reloader=False)
