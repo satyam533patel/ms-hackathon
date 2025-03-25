@@ -1,12 +1,15 @@
-import { useState } from "react";
-import axios from "axios";
-import JobPortal from "./pages/home";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import JobPortal from "./pages/home.jsx"
+import PreInterview from "./pages/PreInterview.jsx";
 
 function App() {
   return (
-    <div>
-      <JobPortal />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<JobPortal />} />
+        <Route path="/pre-interview" element={<PreInterview />} />
+      </Routes>
+    </Router>
   );
 }
 
