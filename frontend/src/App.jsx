@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-
+import JobPortal from "./pages/home.jsx"
 function App() {
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -18,7 +18,7 @@ function App() {
 
   return (
     <div>
-      <h1>Resume Interview Questions</h1>
+      {/* <h1>Resume Interview Questions</h1>
       <button onClick={fetchQuestions} disabled={loading}>
         {loading ? "Generating..." : "Generate Questions"}
       </button>
@@ -26,7 +26,8 @@ function App() {
         {questions.map((q, index) => (
           <li key={index}>{q}</li>
         ))}
-      </ul>
+      </ul> */}
+      JobPortal
     </div>
   );
 }
