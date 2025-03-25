@@ -42,64 +42,66 @@ export default function PreInterview() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Handle speech recognition with answer appending
   const handleSpeechRecognition = () => {
     if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
       alert("Your browser does not support speech recognition.");
       return;
     }
-
+  
     if (!recognitionRef.current) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       const recognition = new SpeechRecognition();
-      recognition.continuous = true; // Keep listening
+      recognition.continuous = true; // ✅ Keeps listening
       recognition.interimResults = false;
       recognition.lang = "en-US";
-
+  
       recognition.onstart = () => setListening(true);
       recognition.onend = () => setListening(false);
-
+  
       recognition.onresult = (event) => {
         const transcript = event.results[event.results.length - 1][0].transcript;
-        setAnswer((prev) => prev + " " + transcript.trim()); // ✅ Append to previous answer
+        setAnswer((prev) => (prev ? `${prev} ${transcript.trim()}` : transcript.trim())); // ✅ Append properly
       };
-
+  
       recognition.onerror = (event) => {
         console.error("Speech recognition error:", event.error);
         setAnswer("⚠️ Speech recognition error.");
       };
-
+  
       recognitionRef.current = recognition;
     }
-
+  
     if (listening) {
       recognitionRef.current.stop();
     } else {
       recognitionRef.current.start();
     }
   };
+  
 
-  // Handle next question
   const handleNext = () => {
-    if (!answer.trim()) {
-      alert("Please answer the question first!");
-      return;
-    }
-
+    if (!answer.trim()) return; // Prevent sending empty responses
+  
     axios.post("http://127.0.0.1:5000/save-answer", {
       question: questions[currentIndex],
       answer: answer.trim(),
+    })
+    .then(() => {
+      if (currentIndex < questions.length - 1) {
+        setCurrentIndex((prevIndex) => prevIndex + 1);
+        setAnswer(""); // ✅ Reset answer for next question
+        speakText(questions[currentIndex + 1]);
+      } else {
+        alert("End of questions. Good luck!");
+        navigate("/");
+      }
+    })
+    .catch((error) => {
+      console.error("Error saving answer:", error);
+      alert("⚠️ Failed to save answer. Please try again.");
     });
-
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex((prevIndex) => prevIndex + 1);
-      setAnswer(""); // ✅ Reset answer for new question
-      speakText(questions[currentIndex + 1]);
-    } else {
-      alert("End of questions. Good luck!");
-      navigate("/");
-    }
   };
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-600 to-blue-600 p-6">

@@ -99,14 +99,19 @@ def save_answer():
         return jsonify({"error": "Missing question or answer"}), 400
 
     try:
+        os.makedirs(RESPONSES_FOLDER, exist_ok=True)  # Ensure folder exists
+
         responses = []
         if os.path.exists(RESPONSES_FILE):
             with open(RESPONSES_FILE, "r") as f:
-                responses = json.load(f)
+                try:
+                    responses = json.load(f)
+                except json.JSONDecodeError:
+                    responses = []
 
         responses.append({"question": question, "answer": answer})
 
-        with open(RESPONSES_FILE, "w") as f:
+        with open(RESPONSES_FILE, "w") as f:  # Open in write mode after reading
             json.dump(responses, f, indent=4)
 
         return jsonify({"message": "Answer saved successfully!"}), 200
