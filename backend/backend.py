@@ -4,12 +4,11 @@ import backend2  # Resume processing logic
 import requests
 import os
 import json
+import jd
 from speaker import synthesize_speech
 from speech import recognize_from_microphone
-
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})  # Allow all requests
-
 # Create necessary folders
 BASE_DIR = os.path.dirname(__file__)
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
@@ -26,7 +25,8 @@ API_KEY = "Fj1KPt7grC6bAkNja7daZUstpP8wZTXsV6Zjr2FOxkO7wsBQ5SzQJQQJ99BCACHYHv6XJ
 
 uploaded_resume = None
 uploaded_jd = None
-
+extracted_resume=""
+job_desc=jd.jd
 @app.route("/upload-resume", methods=["POST"])
 def upload_resume():
     global uploaded_resume  
@@ -60,7 +60,7 @@ def generate_questions():
         return jsonify({"error": "Failed to extract resume data"}), 400
 
     print("✅ Resume extracted successfully:", extracted_data[:100])  # Print first 100 characters
-
+    extratracted_resume=extracted_data
     prompt = f"{extracted_data} Based on the projects mentioned, list three short questions an interviewer might ask."
     payload = {
         "messages": [
@@ -142,6 +142,86 @@ def speech_to_text():
         return jsonify({"text": recognized_text}), 200
     except Exception as e:
         return jsonify({"error": f"Speech recognition error: {str(e)}"}), 500
+@app.route("/job-fit-score", methods=["POST"])
+def job_fit_score():
+    """Calculate job fit score based on the extracted resume and job description."""
+    uploaded_resume = os.path.join(UPLOAD_FOLDER, "Resume.pdf")
+    global extracted_resume, job_desc
+
+    if not uploaded_resume:
+        return jsonify({"error": "No resume uploaded"}), 400  # Handle missing resume
+
+    extracted_resume = backend2.extract_resume_text(uploaded_resume)
+    print(extracted_resume)
+    if not extracted_resume.strip():
+        return jsonify({"error": "Failed to extract resume data"}), 400  # Handle empty extraction
+
+    prompt = f"Given the following job description: {job_desc} and this resume: {extracted_resume}, rate the resume's fit for the job on a scale from 1 to 100. Only return the score."
+
+    payload = {
+        "messages": [
+            {"role": "system", "content": "You are an expert HR assistant."},
+            {"role": "user", "content": prompt}
+        ],
+        "temperature": 0.7
+    }
+
+    headers = {"Content-Type": "application/json", "Authorization": f"Bearer {API_KEY}"}
+
+    try:
+        response = requests.post(API_ENDPOINT, headers=headers, json=payload)
+        response_json = response.json()
+
+        if "choices" in response_json and response_json["choices"]:
+            score_text = response_json["choices"][0].get("message", {}).get("content", "").strip()
+            score = int("".join(filter(str.isdigit, score_text)))  # Extract numerical score
+            return jsonify({"job_fit_score": score}), 200
+    except Exception as e:
+        return jsonify({"error": f"OpenAI API request failed: {str(e)}"}), 500
+
+    return jsonify({"error": "Failed to retrieve job fit score"}), 500
+@app.route("/hr-score", methods=["POST"])
+def hr_score():
+    responses_file = os.path.join(os.getcwd(), "responses", "answers.json")
+    if not os.path.exists(responses_file):
+        return jsonify({"error": "No saved answers found"}), 400
+    
+    try:
+        with open(responses_file, "r") as f:
+            responses = json.load(f)
+    except json.JSONDecodeError:
+        return jsonify({"error": "Failed to parse answers.json"}), 500
+    
+    if not responses:
+        return jsonify({"error": "No answers to evaluate"}), 400
+    
+    prompt = "Analyze the correctness and relevance of the following answers based on the given questions and rate the overall performance on a scale from 1 to 100. Only return the score.\n\n"
+    
+    for qa in responses:
+        prompt += f"Question: {qa['question']}\nAnswer: {qa['answer']}\n\n"
+    
+    payload = {
+        "messages": [
+            {"role": "system", "content": "You are an expert HR evaluator."},
+            {"role": "user", "content": prompt}
+        ],
+        "temperature": 0.7
+    }
+    
+    headers = {"Content-Type": "application/json", "Authorization": f"Bearer {API_KEY}"}
+    
+    try:
+        response = requests.post(API_ENDPOINT, headers=headers, json=payload)
+        response_json = response.json()
+        
+        if "choices" in response_json and response_json["choices"]:
+            score_text = response_json["choices"][0].get("message", {}).get("content", "").strip()
+            score = int("".join(filter(str.isdigit, score_text)))  # Extract numerical score
+            return jsonify({"hr_score": score}), 200
+    except Exception as e:
+        return jsonify({"error": f"OpenAI API request failed: {str(e)}"}), 500
+    
+    return jsonify({"error": "Failed to retrieve HR score"}), 500
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)

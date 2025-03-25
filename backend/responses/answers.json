@@ -1,14 +1,26 @@
 [
     {
-        "question": "1. Can you describe the challenges you faced while integrating the Cohere API into your real-time chat application, Snappy, and how you overcame them?",
-        "answer": "hello hello are you able to record properly"
+        "question": "1. Can you elaborate on the technical challenges you faced while developing the CashLedger Android Application and how you overcame them, particularly with Firebase integration?",
+        "answer": "During development, Firebase real-time data synchronization and offline access were key challenges. I resolved them by optimizing Firestore queries with proper indexing, implementing offline persistence, and using transaction-based updates to ensure data consistency."
     },
     {
-        "question": "2. For your project Twitube, what strategies did you implement to manage and optimize the video data storage and retrieval using Cloudinary?",
-        "answer": "I don't know what to say but they are asking me to say so I am saying something but they are going to show how they are going to show the store the answer thank you"
+        "question": "2. In the Dummy Faculty Recruitment Portal project, how did you ensure data security and integrity, especially given the sensitive nature of the information being handled?",
+        "answer": "Security measures included role-based access control (RBAC), encrypted database fields, and secure API endpoints with JWT authentication. Regular audits and input validation were also implemented to prevent SQL injection and data leaks."
     },
     {
-        "question": "3. In developing both Twitube and Snappy, how did you ensure the security of user data, especially considering the real-time nature of these applications?",
-        "answer": "hello hello"
+        "question": "3. For the CarDash Game, could you discuss the process you used for VGA graphics rendering and how you optimized the game's performance on the ARM-DE1SoC board?",
+        "answer": "The game used direct hardware rendering via VGA buffers, with sprite optimizations and frame-rate control. To enhance performance, I minimized memory usage through efficient asset loading and implemented fixed-point arithmetic for faster calculations on the ARM processor."
+    },
+    {
+        "question": "1. Can you elaborate on the technical challenges you faced while developing the CashLedger Android Application and how you overcame them?",
+        "answer": "it is a very intellect it app and I ended a learning a lot of Amazing powerful tools like Scotland and JavaScript and PornHub"
+    },
+    {
+        "question": "2. In the Dummy Faculty Recruitment Portal project, how did you ensure the security and integrity of the data, especially given the sensitive nature of the information being handled?",
+        "answer": "we store all the data in very passed protective sides and we were also sure about encrypting the data while transferring it"
+    },
+    {
+        "question": "3. For the CarDash Game project developed on the ARM-DE1SoC board, can you describe how you implemented VGA graphics rendering and how you managed resource constraints on the hardware?",
+        "answer": "implemented VGA graphics using push buttons and I manage constants and Hardware using our hardware lab"
     }
 ]
