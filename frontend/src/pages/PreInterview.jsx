@@ -92,8 +92,7 @@ export default function PreInterview() {
         setAnswer(""); // ✅ Reset answer for next question
         speakText(questions[currentIndex + 1]);
       } else {
-        alert("End of questions. Good luck!");
-        navigate("/");
+        navigate("/results"); // ✅ Redirect to results page
       }
     })
     .catch((error) => {
@@ -101,6 +100,7 @@ export default function PreInterview() {
       alert("⚠️ Failed to save answer. Please try again.");
     });
   };
+
   
 
   return (
@@ -132,9 +132,9 @@ export default function PreInterview() {
           onClick={handleNext} 
           className="mt-4 px-4 py-2 bg-blue-500 text-white rounded" 
           disabled={loading}
-        >
-          {loading ? "⏳ Please Wait" : "Next ➡️"}
-        </button>
+          >
+          {loading ? "⏳ Please Wait" : currentIndex === questions.length - 1 ? "Analyze 🧠" : "Next ➡️"}
+          </button>
       </div>
     </div>
   );

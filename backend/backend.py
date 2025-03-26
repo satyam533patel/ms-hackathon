@@ -61,7 +61,7 @@ def generate_questions():
 
     print("✅ Resume extracted successfully:", extracted_data[:100])  # Print first 100 characters
     extratracted_resume=extracted_data
-    prompt = f"{extracted_data} Based on the projects mentioned, list three short questions an interviewer might ask."
+    prompt = f"{extracted_data} Based on the projects mentioned, list 1 short questions an interviewer might ask."
     payload = {
         "messages": [
             {"role": "system", "content": "You are an HR assistant"},
@@ -145,7 +145,7 @@ def speech_to_text():
 @app.route("/job-fit-score", methods=["POST"])
 def job_fit_score():
     """Calculate job fit score based on the extracted resume and job description."""
-    uploaded_resume = os.path.join(UPLOAD_FOLDER, "Resume.pdf")
+    uploaded_resume = os.path.join(UPLOAD_FOLDER, "resume.pdf")
     global extracted_resume, job_desc
 
     if not uploaded_resume:
