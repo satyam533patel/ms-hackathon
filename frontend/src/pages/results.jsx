@@ -43,35 +43,36 @@ export default function Results() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-600 to-blue-600 p-6">
-      <div className="bg-white p-10 rounded-3xl shadow-2xl max-w-md w-full text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">📊 Interview Analysis Results</h2>
-        
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-gray-900 to-black p-6 text-white">
+      <h2 className="text-3xl font-bold mb-6">Interview Analysis Results</h2>
+      <div className="bg-white/10 backdrop-blur-lg border border-white/20 p-10 rounded-3xl shadow-2xl max-w-md w-full text-center">
         {loading ? (
-          <p className="text-lg font-semibold text-gray-700">⏳ Calculating Scores... Please Wait</p>
+          <p className="text-lg font-semibold text-gray-300">Calculating Scores... Please Wait</p>
         ) : (
           <div>
-            <p className="text-lg font-semibold text-gray-700">💼 Job Fit Score: <span className="text-blue-500">{jobFitScore}</span></p>
-            <p className="text-lg font-semibold text-gray-700">🤖 HR Evaluation Score: <span className="text-green-500">{hrScore}</span></p>
+            <p className="text-lg font-semibold text-gray-300">Job Fit Score: <span className="text-blue-400">{jobFitScore}</span></p>
+            <p className="text-lg font-semibold text-gray-300">HR Evaluation Score: <span className="text-green-400">{hrScore}</span></p>
           </div>
         )}
 
-        <button 
-          onClick={sendEmail} 
-          className="mt-6 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
-        >
-          📧 Send Email to Candidate
-        </button>
+        <div className="flex flex-col space-y-3 mt-6">
+          <button 
+            onClick={sendEmail} 
+            className="px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition text-m text-bold"
+          >
+            Send Email to Candidate
+          </button>
 
-        {emailSent && <p className="text-green-600 mt-2">✅ Email sent successfully!</p>}
-        {emailError && <p className="text-red-600 mt-2">❌ {emailError}</p>}
+          {emailSent && <p className="text-green-400 mt-2">Email sent successfully!</p>}
+          {emailError && <p className="text-red-400 mt-2">{emailError}</p>}
 
-        <button 
-          onClick={() => navigate("/")} 
-          className="mt-6 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-        >
-          🏠 Go to Home
-        </button>
+          <button 
+            onClick={() => navigate("/")} 
+            className="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-sm"
+          >
+            Go to Home
+          </button>
+        </div>
       </div>
     </div>
   );

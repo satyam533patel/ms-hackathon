@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { UploadOutlined, ArrowRightOutlined, FileTextOutlined } from "@ant-design/icons";
 
 export default function JobPortal() {
   const [resume, setResume] = useState(null);
   const [jd, setJd] = useState(null);
   const [resumeName, setResumeName] = useState("📄 Upload Resume");
   const [jdName, setJdName] = useState("📜 Upload Job Description");
-  const navigate = useNavigate(); // Navigation hook
+  const navigate = useNavigate();
 
   const handleFileChange = (event, setFile, setFileName) => {
     const file = event.target.files[0];
@@ -17,72 +18,69 @@ export default function JobPortal() {
     }
   };
 
-  const handleUploadResume = async () => {
-    if (!resume) {
-      alert("Please select a resume file.");
+  const handleUpload = async (file, successMessage, errorMessage) => {
+    if (!file) {
+      alert("Please select a file before uploading.");
       return;
     }
     const formData = new FormData();
-    formData.append("resume", resume);
+    formData.append("resume", file);
 
     try {
-      await axios.post("http://127.0.0.1:5000/upload-resume", formData, {
+      await axios.post(`http://127.0.0.1:5000/upload-resume`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      alert("Resume uploaded successfully");
+      alert(successMessage);
     } catch (error) {
       console.error("Upload failed", error);
-      alert("Resume upload failed.");
-    }
-  };
-
-  const handleUploadJD = async () => {
-    if (!jd) {
-      alert("Please select a job description file.");
-      return;
-    }
-    const formData = new FormData();
-    formData.append("jd", jd);
-
-    try {
-      await axios.post("http://127.0.0.1:5000/upload-jd", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      alert("Job Description uploaded successfully");
-    } catch (error) {
-      console.error("Upload failed", error);
-      alert("Job Description upload failed.");
+      alert(errorMessage);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-600 to-blue-600 p-6">
-      <div className="bg-white p-10 rounded-3xl shadow-2xl max-w-md w-full text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">🚀 The Tachyons Job Portal</h2>
+    <div className="min-h-screen flex flex-col bg-gray-900 text-white">
+      {/* Header */}
+      <header className="w-full bg-transparent py-4 text-center text-3xl font-semibold text-white">
+        The Tachyons Virtual HR
+      </header>
 
-        <div className="space-y-5">
-          <label className="block cursor-pointer border-2 border-dashed border-gray-400 text-gray-700 font-semibold py-3 rounded-lg hover:bg-gray-100 transition">
-            <input type="file" onChange={(e) => handleFileChange(e, setResume, setResumeName)} className="hidden" />
-            {resumeName}
-          </label>
-          <button onClick={handleUploadResume} className="w-full bg-blue-500 text-white font-semibold py-3 rounded-lg hover:bg-blue-600">
-            Submit Resume
-          </button>
+      {/* Main Content */}
+      <div className="flex-grow flex items-center justify-center p-6">
+        <div className="bg-black border border-gray-700 p-10 rounded-xl shadow-lg max-w-3xl w-full text-center">
+          <div className="grid grid-cols-2 gap-8 text-left">
+            <div>
+              <label className="block text-white font-medium mb-2 text-lg">📄 Resume</label>
+              <label className="block border-2 border-dashed border-gray-600 text-white/80 py-8 text-lg rounded-lg text-center cursor-pointer hover:border-gray-400 transition">
+                <input type="file" onChange={(e) => handleFileChange(e, setResume, setResumeName)} className="hidden" />
+                <FileTextOutlined className="mr-2 text-xl" /> {resumeName}
+              </label>
+              <button onClick={() => handleUpload(resume, "Resume uploaded successfully", "Resume upload failed.")} className="mt-4 w-full bg-gray-800 text-white font-medium py-3 rounded-lg hover:bg-gray-700 transition">
+                <UploadOutlined className="mr-2" /> Submit Resume
+              </button>
+            </div>
 
-          <label className="block cursor-pointer border-2 border-dashed border-gray-400 text-gray-700 font-semibold py-3 rounded-lg hover:bg-gray-100 transition">
-            <input type="file" onChange={(e) => handleFileChange(e, setJd, setJdName)} className="hidden" />
-            {jdName}
-          </label>
-          <button onClick={handleUploadJD} className="w-full bg-blue-500 text-white font-semibold py-3 rounded-lg hover:bg-blue-600">
-            Submit Job Description
-          </button>
+            <div>
+              <label className="block text-white font-medium mb-2 text-lg">📜 Job Description</label>
+              <label className="block border-2 border-dashed border-gray-600 text-white/80 py-8 text-lg rounded-lg text-center cursor-pointer hover:border-gray-400 transition">
+                <input type="file" onChange={(e) => handleFileChange(e, setJd, setJdName)} className="hidden" />
+                <FileTextOutlined className="mr-2 text-xl" /> {jdName}
+              </label>
+              <button onClick={() => handleUpload(jd, "upload-jd", "Job Description uploaded successfully", "Job Description upload failed.")} className="mt-4 w-full bg-gray-800 text-white font-medium py-3 rounded-lg hover:bg-gray-700 transition">
+                <UploadOutlined className="mr-2" /> Submit Job Description
+              </button>
+            </div>
+          </div>
 
-          {/* Proceed Button */}
-          <button onClick={() => navigate("/pre-interview")} className="w-full bg-green-500 text-white font-semibold py-3 rounded-lg hover:bg-green-600">
-            ➡️ Proceed to Pre-Interview
+          <button onClick={() => navigate("/pre-interview")} className="mt-8 w-full bg-green-700 text-white font-medium py-3 rounded-lg hover:bg-green-600 transition">
+            ➡️ Proceed to Pre-Interview <ArrowRightOutlined className="ml-2" />
           </button>
         </div>
       </div>
+      
+      {/* Footer */}
+      <footer className="w-full bg-black shadow-md py-4 text-center text-gray-400 text-sm">
+        © 2025 Tachyons Job Portal. All Rights Reserved.
+      </footer>
     </div>
   );
 }

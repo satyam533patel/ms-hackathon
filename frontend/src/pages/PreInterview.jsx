@@ -13,7 +13,6 @@ export default function PreInterview() {
   const navigate = useNavigate();
   const hasFetched = useRef(false);
 
-  // Read text aloud
   const speakText = async (text) => {
     if (!text) return;
     setSpeaking(true);
@@ -25,7 +24,6 @@ export default function PreInterview() {
     setTimeout(() => setSpeaking(false), 3000);
   };
 
-  // Fetch questions when component mounts
   useEffect(() => {
     if (hasFetched.current) return;
     hasFetched.current = true;
@@ -51,7 +49,7 @@ export default function PreInterview() {
     if (!recognitionRef.current) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       const recognition = new SpeechRecognition();
-      recognition.continuous = true; // ✅ Keeps listening
+      recognition.continuous = true;
       recognition.interimResults = false;
       recognition.lang = "en-US";
   
@@ -60,12 +58,12 @@ export default function PreInterview() {
   
       recognition.onresult = (event) => {
         const transcript = event.results[event.results.length - 1][0].transcript;
-        setAnswer((prev) => (prev ? `${prev} ${transcript.trim()}` : transcript.trim())); // ✅ Append properly
+        setAnswer((prev) => (prev ? `${prev} ${transcript.trim()}` : transcript.trim()));
       };
   
       recognition.onerror = (event) => {
         console.error("Speech recognition error:", event.error);
-        setAnswer("⚠️ Speech recognition error.");
+        setAnswer("Speech recognition error.");
       };
   
       recognitionRef.current = recognition;
@@ -77,10 +75,9 @@ export default function PreInterview() {
       recognitionRef.current.start();
     }
   };
-  
 
   const handleNext = () => {
-    if (!answer.trim()) return; // Prevent sending empty responses
+    if (!answer.trim()) return;
   
     axios.post("http://127.0.0.1:5000/save-answer", {
       question: questions[currentIndex],
@@ -89,52 +86,51 @@ export default function PreInterview() {
     .then(() => {
       if (currentIndex < questions.length - 1) {
         setCurrentIndex((prevIndex) => prevIndex + 1);
-        setAnswer(""); // ✅ Reset answer for next question
+        setAnswer("");
         speakText(questions[currentIndex + 1]);
       } else {
-        navigate("/results"); // ✅ Redirect to results page
+        navigate("/results");
       }
     })
     .catch((error) => {
       console.error("Error saving answer:", error);
-      alert("⚠️ Failed to save answer. Please try again.");
+      alert("Failed to save answer. Please try again.");
     });
   };
 
-  
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-600 to-blue-600 p-6">
-      <div className="bg-white p-10 rounded-3xl shadow-2xl max-w-md w-full text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">🎤 Pre-Interview Questions</h2>
-
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-gray-900 to-black p-6 text-white">
+      <h2 className="text-3xl font-bold mb-6">Pre-Interview Questions</h2>
+      <div className="bg-white/10 backdrop-blur-lg border border-white/20 p-10 rounded-3xl shadow-2xl max-w-md w-full text-center">
         {loading ? (
-          <p className="text-lg font-semibold text-gray-700">⏳ Processing Resume... Please Wait</p>
+          <p className="text-lg font-semibold text-gray-300">Processing Resume... Please Wait</p>
         ) : questions.length > 0 ? (
-          <p className="text-lg font-semibold text-gray-700">{questions[currentIndex]}</p>
+          <p className="text-lg font-semibold text-gray-300">{questions[currentIndex]}</p>
         ) : (
-          <p className="text-lg font-semibold text-red-500">⚠️ No questions available. Please check the backend.</p>
+          <p className="text-lg font-semibold text-red-500">No questions available. Please check the backend.</p>
         )}
 
-        <div className="w-full p-3 mt-4 border rounded-lg bg-gray-100 text-gray-800 text-lg min-h-[50px]">
-          {answer || "Listening... 🎤"}
+        <div className="w-full p-3 mt-4 border rounded-lg bg-gray-800 text-gray-300 text-lg min-h-[50px]">
+          {answer || "Listening..."}
         </div>
 
-        <button 
-          onClick={handleSpeechRecognition} 
-          className={`mt-4 px-4 py-2 text-white rounded ${speaking ? "bg-gray-400 cursor-not-allowed" : listening ? "bg-red-500" : "bg-green-500"}`} 
-          disabled={speaking}
-        >
-          {listening ? "🔴 Stop Listening" : "🎙️ Start Listening"}
-        </button>
-
-        <button 
-          onClick={handleNext} 
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded" 
-          disabled={loading}
+        <div className="flex justify-between mt-4 space-x-4">
+          <button 
+            onClick={handleSpeechRecognition} 
+            className={`px-4 py-2 text-white rounded flex-1 ${speaking ? "bg-gray-400 cursor-not-allowed" : listening ? "bg-red-500" : "bg-green-500"}`} 
+            disabled={speaking}
           >
-          {loading ? "⏳ Please Wait" : currentIndex === questions.length - 1 ? "Analyze 🧠" : "Next ➡️"}
+            {listening ? "Stop Listening" : "Start Listening"}
           </button>
+          
+          <button 
+            onClick={handleNext} 
+            className="px-4 py-2 bg-blue-500 text-white rounded flex-1" 
+            disabled={loading}
+          >
+            {loading ? "Please Wait" : currentIndex === questions.length - 1 ? "Analyze" : "Next"}
+          </button>
+        </div>
       </div>
     </div>
   );
