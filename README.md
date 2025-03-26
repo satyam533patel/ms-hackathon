@@ -65,8 +65,8 @@ npm run dev
 
 ## 🏆 Team Members
 
-Satyam Patel (2201CS64)
-Rahul Chandu Nikhate (2201CS57)
-Harsh Kumar (2201AI14)
-Saumya Pratap Singh (2201AI35)
+- Satyam Patel (2201CS64)
+- Rahul Chandu Nikhate (2201CS57)
+- Harsh Kumar (2201AI14)
+- Saumya Pratap Singh (2201AI35)
 
