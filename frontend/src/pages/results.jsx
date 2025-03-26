@@ -6,6 +6,8 @@ export default function Results() {
   const [jobFitScore, setJobFitScore] = useState(null);
   const [hrScore, setHrScore] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [emailSent, setEmailSent] = useState(false);
+  const [emailError, setEmailError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,6 +28,20 @@ export default function Results() {
     fetchScores();
   }, []);
 
+  const sendEmail = async () => {
+    setEmailError(null);
+    setEmailSent(false);
+    try {
+      const response = await axios.post("http://127.0.0.1:5000/sendMail");
+      if (response.status === 200) {
+        setEmailSent(true);
+      }
+    } catch (error) {
+      setEmailError("Failed to send email. Please try again.");
+      console.error("Email error:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-600 to-blue-600 p-6">
       <div className="bg-white p-10 rounded-3xl shadow-2xl max-w-md w-full text-center">
@@ -41,8 +57,18 @@ export default function Results() {
         )}
 
         <button 
+          onClick={sendEmail} 
+          className="mt-6 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
+        >
+          📧 Send Email to Candidate
+        </button>
+
+        {emailSent && <p className="text-green-600 mt-2">✅ Email sent successfully!</p>}
+        {emailError && <p className="text-red-600 mt-2">❌ {emailError}</p>}
+
+        <button 
           onClick={() => navigate("/")} 
-          className="mt-6 px-4 py-2 bg-blue-500 text-white rounded"
+          className="mt-6 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
         >
           🏠 Go to Home
         </button>
