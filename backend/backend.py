@@ -7,6 +7,9 @@ import json
 import jd
 from speaker import synthesize_speech
 from speech import recognize_from_microphone
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})  # Allow all requests
 # Create necessary folders
@@ -27,6 +30,8 @@ uploaded_resume = None
 uploaded_jd = None
 extracted_resume=""
 job_desc=jd.jd
+jobScore= 65
+hrScore=65
 @app.route("/upload-resume", methods=["POST"])
 def upload_resume():
     global uploaded_resume  
@@ -61,7 +66,7 @@ def generate_questions():
 
     print("✅ Resume extracted successfully:", extracted_data[:100])  # Print first 100 characters
     extratracted_resume=extracted_data
-    prompt = f"{extracted_data} Based on the projects mentioned, list 1 short questions an interviewer might ask."
+    prompt = f"{extracted_data} Based on the projects mentioned, list 2 short questions an interviewer might ask."
     payload = {
         "messages": [
             {"role": "system", "content": "You are an HR assistant"},
@@ -146,7 +151,7 @@ def speech_to_text():
 def job_fit_score():
     """Calculate job fit score based on the extracted resume and job description."""
     uploaded_resume = os.path.join(UPLOAD_FOLDER, "resume.pdf")
-    global extracted_resume, job_desc
+    global extracted_resume, job_desc, jobScore
 
     if not uploaded_resume:
         return jsonify({"error": "No resume uploaded"}), 400  # Handle missing resume
@@ -175,6 +180,7 @@ def job_fit_score():
         if "choices" in response_json and response_json["choices"]:
             score_text = response_json["choices"][0].get("message", {}).get("content", "").strip()
             score = int("".join(filter(str.isdigit, score_text)))  # Extract numerical score
+            jobScore = score
             return jsonify({"job_fit_score": score}), 200
     except Exception as e:
         return jsonify({"error": f"OpenAI API request failed: {str(e)}"}), 500
@@ -182,6 +188,7 @@ def job_fit_score():
     return jsonify({"error": "Failed to retrieve job fit score"}), 500
 @app.route("/hr-score", methods=["POST"])
 def hr_score():
+    global hrScore
     responses_file = os.path.join(os.getcwd(), "responses", "answers.json")
     if not os.path.exists(responses_file):
         return jsonify({"error": "No saved answers found"}), 400
@@ -217,11 +224,73 @@ def hr_score():
         if "choices" in response_json and response_json["choices"]:
             score_text = response_json["choices"][0].get("message", {}).get("content", "").strip()
             score = int("".join(filter(str.isdigit, score_text)))  # Extract numerical score
+            hrScore= score
             return jsonify({"hr_score": score}), 200
     except Exception as e:
         return jsonify({"error": f"OpenAI API request failed: {str(e)}"}), 500
     
     return jsonify({"error": "Failed to retrieve HR score"}), 500
+
+@app.route('/sendMail', methods=['POST'])
+def send_email():
+    global uploaded_resume
+    if not uploaded_resume:
+        return jsonify({"error": "No resume uploaded"}), 400
+
+    extracted_data = backend2.extract_resume_text(uploaded_resume)
+    rq_data = extracted_data + "From this data, extract and return the candidate email. In response, give me the email only, and not a single word extra."
+
+    # Prepare API request payload
+    payload = {
+        "messages": [{"role": "system", "content": "You are an HR assistant"},
+                     {"role": "user", "content": rq_data}],
+        "temperature": 0.7
+    }
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {API_KEY}"
+    }
+
+    try:
+        # Make request to OpenAI API
+        response = requests.post(API_ENDPOINT, headers=headers, json=payload)
+        response_json = response.json()
+        print(response_json)
+        candidate_email = response_json['choices'][0]['message']['content']
+    except Exception as e:
+        return jsonify({"error": "Failed to extract candidate email", "details": str(e)}), 500
+
+    from_email = "hootiitp@gmail.com"
+    password = "lebx hxtc yzag umal"  # Use environment variables for security
+    
+    subject = "Job Application Received"
+    totalScore = (2 * jobScore + hrScore) / 3
+    
+    if totalScore > 60:
+        body = "Dear Candidate, Thank You for submitting your response. We are glad to inform you that you have been shortlisted for interviews.\n\nBest Regards,\nHR Team"
+    else:
+        body = "Dear Candidate, Thank You for submitting your response. After careful consideration, we have decided not to move forward with your application.\n\nBest Regards,\nHR Team"
+
+    # Set up email message
+    msg = MIMEMultipart()
+    msg['From'] = from_email
+    msg['To'] = candidate_email
+    msg['Subject'] = subject
+    msg.attach(MIMEText(body, 'plain'))
+
+    try:
+        # Connect to SMTP server (Gmail SMTP used here)
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+        server.login(from_email, password)
+        server.sendmail(from_email, candidate_email, msg.as_string())
+        server.quit()
+        print("Email sent successfully!")
+        return jsonify({"message": "Email sent successfully!"}), 200
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": "Failed to send email", "details": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)

@@ -6,5 +6,13 @@
     {
         "question": "1. Can you describe the challenges you faced during the development of the Faculty Recruitment Portal and how you overcame them?",
         "answer": "the main challenge that we faced was to prevent other uses from seeing each others data a basically data security to ensure it we have given a unique ID so that when I someone logs in he retrieves is unique ID and his data is shown and he cannot change his unic ID"
+    },
+    {
+        "question": "1. Can you elaborate on the challenges you faced during the development of the Faculty Recruitment Portal and how you overcame them, particularly with data storage and retrieval?",
+        "answer": "I stored all the data very smartly and intelligently as that's what I am."
+    },
+    {
+        "question": "2. In your Tic-Tac-Toe game project, you implemented an alpha-beta pruning algorithm. Could you explain how this algorithm improves the efficiency of the game, and why you chose it over other potential solutions?",
+        "answer": "Thing else came to my mind."
     }
 ]
