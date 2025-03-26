@@ -11,22 +11,32 @@ export default function Results() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let isMounted = true; // Prevent state updates if the component unmounts
+
     const fetchScores = async () => {
       try {
-        const jobFitResponse = await axios.post("http://127.0.0.1:5000/job-fit-score");
-        const hrScoreResponse = await axios.post("http://127.0.0.1:5000/hr-score");
-        
-        setJobFitScore(jobFitResponse.data.job_fit_score);
-        setHrScore(hrScoreResponse.data.hr_score);
+        const [jobFitResponse, hrScoreResponse] = await Promise.all([
+          axios.post("http://127.0.0.1:5000/job-fit-score"),
+          axios.post("http://127.0.0.1:5000/hr-score"),
+        ]);
+
+        if (isMounted) {
+          setJobFitScore(jobFitResponse.data.job_fit_score);
+          setHrScore(hrScoreResponse.data.hr_score);
+        }
       } catch (error) {
         console.error("Error fetching scores:", error);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
-    
+
     fetchScores();
-  }, []);
+
+    return () => {
+      isMounted = false; // Cleanup function to prevent memory leaks
+    };
+  }, []); // Empty dependency array ensures the effect runs only once
 
   const sendEmail = async () => {
     setEmailError(null);
@@ -50,14 +60,18 @@ export default function Results() {
           <p className="text-lg font-semibold text-gray-300">Calculating Scores... Please Wait</p>
         ) : (
           <div>
-            <p className="text-lg font-semibold text-gray-300">Job Fit Score: <span className="text-blue-400">{jobFitScore}</span></p>
-            <p className="text-lg font-semibold text-gray-300">HR Evaluation Score: <span className="text-green-400">{hrScore}</span></p>
+            <p className="text-lg font-semibold text-gray-300">
+              Job Fit Score: <span className="text-blue-400">{jobFitScore}</span>
+            </p>
+            <p className="text-lg font-semibold text-gray-300">
+              HR Evaluation Score: <span className="text-green-400">{hrScore}</span>
+            </p>
           </div>
         )}
 
         <div className="flex flex-col space-y-3 mt-6">
-          <button 
-            onClick={sendEmail} 
+          <button
+            onClick={sendEmail}
             className="px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition text-m text-bold"
           >
             Send Email to Candidate
@@ -66,8 +80,8 @@ export default function Results() {
           {emailSent && <p className="text-green-400 mt-2">Email sent successfully!</p>}
           {emailError && <p className="text-red-400 mt-2">{emailError}</p>}
 
-          <button 
-            onClick={() => navigate("/")} 
+          <button
+            onClick={() => navigate("/")}
             className="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-sm"
           >
             Go to Home

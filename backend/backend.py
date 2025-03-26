@@ -148,21 +148,25 @@ def speech_to_text():
     except Exception as e:
         return jsonify({"error": f"Speech recognition error: {str(e)}"}), 500
 @app.route("/job-fit-score", methods=["POST"])
+@app.route("/job-fit-score", methods=["POST"])
 def job_fit_score():
     """Calculate job fit score based on the extracted resume and job description."""
-    uploaded_resume = os.path.join(UPLOAD_FOLDER, "resume.pdf")
+    # Construct the full path to the resume file
+    resume_path = os.path.join(UPLOAD_FOLDER, "resume.pdf")
     global extracted_resume, job_desc, jobScore
 
-    if not uploaded_resume:
-        return jsonify({"error": "No resume uploaded"}), 400  # Handle missing resume
+    # Check that the file actually exists on disk
+    if not os.path.exists(resume_path):
+        return jsonify({"error": "No resume uploaded"}), 400
 
-    extracted_resume = backend2.extract_resume_text(uploaded_resume)
-    print(extracted_resume)
+    # Extract resume text from the file
+    extracted_resume = backend2.extract_resume_text(resume_path)
+    print("Extracted resume text:", extracted_resume)
     if not extracted_resume.strip():
-        return jsonify({"error": "Failed to extract resume data"}), 400  # Handle empty extraction
+        return jsonify({"error": "Failed to extract resume data"}), 400
 
+    # Build prompt for job-fit score
     prompt = f"Given the following job description: {job_desc} and this resume: {extracted_resume}, rate the resume's fit for the job on a scale from 1 to 100. Only return the score."
-
     payload = {
         "messages": [
             {"role": "system", "content": "You are an expert HR assistant."},
@@ -170,13 +174,11 @@ def job_fit_score():
         ],
         "temperature": 0.7
     }
-
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {API_KEY}"}
 
     try:
         response = requests.post(API_ENDPOINT, headers=headers, json=payload)
         response_json = response.json()
-
         if "choices" in response_json and response_json["choices"]:
             score_text = response_json["choices"][0].get("message", {}).get("content", "").strip()
             score = int("".join(filter(str.isdigit, score_text)))  # Extract numerical score
@@ -186,6 +188,7 @@ def job_fit_score():
         return jsonify({"error": f"OpenAI API request failed: {str(e)}"}), 500
 
     return jsonify({"error": "Failed to retrieve job fit score"}), 500
+
 @app.route("/hr-score", methods=["POST"])
 def hr_score():
     global hrScore

@@ -34,5 +34,13 @@
     {
         "question": "- \"Given your experience with programming languages like C++, Java, or Python, can you describe a project where you utilized these skills to develop a software application or improve an existing system? What challenges did you face, and how did you overcome them?\"",
         "answer": "Rahul is gay for Satyam."
+    },
+    {
+        "question": "1. Can you describe the challenges you faced while developing the Faculty Recruitment Portal and how you overcame them, particularly with regards to handling concurrent data storage and retrieval?",
+        "answer": "no I cannot describe it"
+    },
+    {
+        "question": "2. In your Home Workout App project, how did you ensure user data security and privacy, especially when dealing with user registration and cloud storage?",
+        "answer": "no we didn't ensure data security everything is available"
     }
 ]
