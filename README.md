@@ -1,8 +1,9 @@
 # Tachyons Virtual HR  
-🚀 Built for [Hackathon Name] - [Year]
+🚀 Built for Microsoft Azure - 2025
 
 ## 📌 Overview
 Tachyons Virtual HR is an AI-powered pre-screening system designed to automate the candidate evaluation process. It analyzes resumes, evaluates technical and HR-based responses, generates scores, and sends candidates their results via email. The system also logs all applicant data for future reference.
+
 
 ## 🚀 Features
 - 📄 Resume Parsing: Extracts text from uploaded PDF resumes.
@@ -13,6 +14,37 @@ Tachyons Virtual HR is an AI-powered pre-screening system designed to automate t
 - 📂 Data Storage: Saves each candidate’s Name, Email, HR Score, Resume Fit Score, and Selection Status in an Excel file for future reference.
 
 ## 🏗️ Tech Stack
+
+## Workflow
+
+### Resume Upload
+The applicant uploads their resume (PDF format).
+The system stores the resume and extracts relevant text data for further analysis.
+![image](https://github.com/user-attachments/assets/39f2c3aa-d545-4377-aaab-653b088bf8bd)
+
+### Job Description Input
+HR provides the job description (JD) for the role.
+The system uses the JD and the extracted resume data to assess the applicant's suitability.
+### Question Generation
+The system analyzes the resume content and generates interview questions tailored to the applicant’s skills and experience.
+HR can review, edit, or approve the generated questions before proceeding.
+![image](https://github.com/user-attachments/assets/03c61292-0ca7-4eec-b678-82660ff7dbcf)
+
+### Answer Collection
+The applicant provides responses to the generated questions.
+Responses are recorded and stored for evaluation.
+### Job Fit Score Calculation
+The system compares the resume content with the provided JD.
+A job fit score (out of 100) is calculated using AI-driven analysis.
+### HR Score Evaluation
+The system evaluates the applicant’s answers for correctness and relevance.
+A final HR score (out of 100) is generated to assess the quality of responses.
+### Final Assessment & Email Notification
+A final score is computed using the Job Fit Score and HR Score.
+If the applicant meets the required threshold, they are shortlisted.
+The system extracts the applicant’s email address and notifies them of the results.
+![image](https://github.com/user-attachments/assets/bb09e3b3-f4bd-40f5-a2cf-fc76f1fa57fc)
+
 
 ### Backend:
 
